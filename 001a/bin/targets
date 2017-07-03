@@ -1,0 +1,4 @@
+#!/bin/bash
+
+find -L data/SNAP_bams/ -type f -name "*unpaired.bam" \
+| sed "s#data/SNAP_bams/#results/Mito_NC_012920.#g"
