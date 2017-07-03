@@ -1,0 +1,47 @@
+< ../config.mk
+
+ll:QV:
+	bin/targets | xargs mk
+##							SM-3MGPZ_DHG02382_H2L7KCCXX_L4_R2.paired.fastq.gz <- asi se llaman los trimmed que se usaron para SNAP
+##data/SNAP_bams/			SM-3MGPZ_DHG02382_H2L7KCCXX_L4.paired.bam <- asi se llama el archivo data
+##results/Mito_NC_012920.	SM-3MGPZ_DHG02382_H2L7KCCXX_L4.paired.bam <- asi se va a llamar el result
+results/Mito_NC_012920.%.bam:Q: tmp/fastq_extracts/R1_%.fastqz tmp/fastq_extracts/R2_%.fastqz
+	echo "[DEBUGGING] mapping to $target"
+
+tmp/fastq_extracts/R1_%.fastqz:Q: tmp/fastq_extracts/R1_Mito_%.fastq tmp/fastq_extracts/R1_nonalligned_%.fastq
+	echo "[DEBUGGING] compressing R1 reads into $target"
+
+tmp/fastq_extracts/R2_%.fastqz:Q: tmp/fastq_extracts/R2_Mito_%.fastq tmp/fastq_extracts/R2_nonalligned_%.fastq
+	echo "[DEBUGGING] compressing R2 reads into $target"
+
+tmp/fastq_extracts/R1_nonalligned_%.fastq tmp/fastq_extracts/R2_nonalligned_%.fastq:Q: ##tmp/SAM_extracts/%.non_aligned.bam ##y los prereq del nonaligned bam, son: nonaligned con flag read unmapped, con flag mate unmapped, con flag both reads unmapped, luego juntar esos tres y hacerles sort -u ¿¿¿-n??? (para arreglar por nombre de read-read_id (supongo que sí, ya que estás haciendo sort, queé más da organizarlo) ese sam resultante, convertirlo a BAM
+	echo "[DEBUGGING] splitting nonalligned $prereq into $target"
+
+tmp/fastq_extracts/R1_Mito_%.fastq tmp/fastq_extracts/R2_Mito_%.fastq:Q: tmp/SAM_extracts/%.chrM.bam
+	echo "[DEBUGGING] splitting mitochondrial $prereq into $target"
+	mkdir -p $(dirname $target)
+	R1_FILE=$(echo $target | cut -d" " -f1)
+	R2_FILE=$(echo $target | cut -d" " -f2)
+	echo "[DEBUGGING] R1 file is $R1_FILE"
+	echo "[DEBUGGING] R2 file is $R2_FILE"
+	bamToFastq -i $prereq -fq $R1_FILE.build -fq2 $R2_FILE.build &&
+	mv $R1_FILE.build $R1_FILE &&
+	mv $R2_FILE.build $R2_FILE
+
+tmp/SAM_extracts/%.chrM.bam:Q: tmp/SAM_extracts/%.header.sam tmp/SAM_extracts/%.chrM.body
+	echo "[DEBUGGING] crating mitochondrial bam in $target"
+	cat $prereq | samtools view -S -b - > $target.build &&
+	mv $target.build $target &&
+##	rm tmp/SAM_extracts/$stem.chrM.body
+
+tmp/SAM_extracts/%.chrM.body:Q: data/SNAP_bams/%.bam
+	echo "[DEBUGGING] grepping for chrM, results in $target"
+	mkdir -p $(dirname $target)
+	samtools view $prereq | grep -P "\tchrM__" > $target.build &&
+	mv $target.build $target
+
+tmp/SAM_extracts/%.header.sam:Q: data/SNAP_bams/%.bam
+	echo "[DEBUGGING] extracting header from $prereq"
+	mkdir -p $(dirname $target)
+	samtools view -H $prereq > $target.build &&
+	mv $target.build $target
