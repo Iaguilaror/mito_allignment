@@ -1,4 +1,9 @@
 #!/bin/bash
 
 find -L data/SNAP_bams/ -type f -name "*.paired.bam" \
-| sed "s#data/SNAP_bams/#results/Mito_NC_012920.#g"
+| sed -e "s#data/SNAP_bams/#results/R1_formito_#g" \
+-e "s#.bam#.fastq.gz#g"
+
+find -L data/SNAP_bams/ -type f -name "*.paired.bam" \
+| sed -e "s#data/SNAP_bams/#results/R2_formito_#g" \
+-e "s#.bam#.fastq.gz#g"
