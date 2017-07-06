@@ -17,25 +17,13 @@ results/R1_Mito_%.fastq results/R2_Mito_%.fastq:Q: data/SNAP_bams/%.bam
 	&& mv $R1_FILE.build $R1_FILE \
 	&& mv $R2_FILE.build $R2_FILE
 
-results/%.unmapped.f12F56:Q: data/SNAP_bams/%.bam
-	echo "[DEBUGGING] extracting unmapped reads with unmapped mate (-f12) and not primary alligment (-F256)."
+'results/(.*)\.unmapped\.f([0-9]+)F([0-9]+)':Q: 'data/SNAP_bams/\1\.bam'
 	mkdir -p $(dirname $target)
-	samtools view -h -u -f 12 -F 256 $prereq > $target.build \
+	samtools view -h -u -f $stem2 -F $stem3 $prereq > $target.build \
 	&& mv $target.build $target
 
-results/%.unmapped.f8F260:Q: data/SNAP_bams/%.bam
-	echo "[DEBUGGING] extracting mapped reads (-F260 -meaning NOT read unmapped) whose mate is unmapped (-f8)."
-	mkdir -p $(dirname $target)
-	samtools view -h -u -f 8 -F 260 $prereq > $target.build \
-	&& mv $target.build $target
-
-results/%.unmapped.f4F264:Q: data/SNAP_bams/%.bam
-	echo "[DEBUGGING] extracting unmapped reads (-f4) whose mate is mapped (-F264 -meaning NOT mate unmapped)."
-	mkdir -p $(dirname $target)
-	samtools view -h -u -f 4 -F 264 $prereq > $target.build \
-	&& mv $target.build $target
-
-results/R1_nonalligned_%.fastq results/R2_nonalligned_%.fastq:Q: results/%.unmapped.f4F264 results/%.unmapped.f8F260 results/%.unmapped.f12F56
+results/R1_nonalligned_%.fastq \
+results/R2_nonalligned_%.fastq:Q: results/%.unmapped.f4F264 results/%.unmapped.f8F260 results/%.unmapped.f12F56
 	echo "[DEBUGGING] splitting nonalligned $prereq into $target"
 	mkdir -p $(dirname $target)
 	R1_FILE=$(echo $target | cut -d" " -f1)
@@ -51,14 +39,8 @@ results/R1_nonalligned_%.fastq results/R2_nonalligned_%.fastq:Q: results/%.unmap
 	&& mv $R2_FILE.build $R2_FILE \
 	&& rm $prereq
 
-results/R1_formito_%.fastq.gz:Q: results/R1_Mito_%.fastq results/R1_nonalligned_%.fastq
-	echo "[DEBUGGING] compressing R1 reads into $target"
-	cat $prereq | gzip -f -9 > $target.build \
-	&& mv $target.build $target \
-	&& rm $prereq
-
-results/R2_formito_%.fastq.gz:Q: results/R2_Mito_%.fastq results/R2_nonalligned_%.fastq
-	echo "[DEBUGGING] compressing R2 reads into $target"
+'results/(R[12])_formito_(.*)\.fastq\.gz':RQ: 'results/\1_Mito_\2\.fastq' 'results/\1_nonalligned_\2\.fastq'
+	echo "[DEBUGGING] compressing $stem1 reads into $target"
 	cat $prereq | gzip -f -9 > $target.build \
 	&& mv $target.build $target \
 	&& rm $prereq
