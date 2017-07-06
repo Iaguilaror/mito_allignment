@@ -1,0 +1,3 @@
+TEST_SAMPLE="SM-3MG3L_DHG02288_H3VGKCCXX_L8_R1"
+
+bin/targets | grep $TEST_SAMPLE | xargs mk
