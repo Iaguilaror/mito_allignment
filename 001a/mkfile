@@ -3,37 +3,24 @@
 all:QV:
 	bin/targets | xargs mk
 
-results/Mito_NC_012920.%.bam:Q: tmp/fastq_extracts/%.for_mito.fastq.gz
+results/%.chrM.fastq:Q: data/SNAP_bams/%.bam
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing $target"
-####HERE ADD CODE TO PERFORM BWA MEM ALIGNMENT
+	samtools view -h -F 4 $prereq \
+	| grep -e "chrM__" -e "^@" \
+	| samtools view -S -b - \
+	| bamToFastq -i - -fq $target.build \
+	&& mv $target.build $target
 
-tmp/fastq_extracts/%.for_mito.fastq.gz:Q: tmp/SAM_extracts/%.chrM.sam tmp/SAM_extracts/%.non_aligned.sam
+results/%.unmapped.fastq:Q: data/SNAP_bams/%.bam
+	mkdir -p $(dirname $target)
+	echo "[DEBUGGING]doing $target"
+	samtools view -h -f 4 -b $prereq \
+	| bamToFastq -i - -fq $target.build \
+	&& mv $target.build $target
+
+results/formito_%.fastq.gz:Q: results/%.chrM.fastq results/%.unmapped.fastq
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing fastq convertion to $target"
-	> $target.build
-	cat $prereq \
-	| cut -f1,10,11 \
-	| sort -u > tmp/SAM_extracts/$stem.merged_fields.txt &&
-	while read p
-	do
-		READid="@$(echo $p | cut -d" " -f1)"
-		SEQUENCE="$(echo $p | cut -d" " -f2)"
-		QUAL="$(echo $p | cut -d" " -f3)"
-		echo "$READid\n$SEQUENCE\n+\n$QUAL" >> $target.build
-	done < tmp/SAM_extracts/$stem.merged_fields.txt &&
-	gzip -f -9 $target.build &&
-	mv $target.build.gz $target &&
-	rm $prereq tmp/SAM_extracts/$stem.merged_fields.txt
-
-tmp/SAM_extracts/%.non_aligned.sam:Q: data/SNAP_bams/%.bam
-	mkdir -p $(dirname $target)
-	echo "[DEBUGGING]doing $target"
-	samtools view -f 4 $prereq > $target.build &&
-	mv $target.build $target
-
-tmp/SAM_extracts/%.chrM.sam:Q: data/SNAP_bams/%.bam
-	mkdir -p $(dirname $target)
-	echo "[DEBUGGING]doing $target"
-	samtools view $prereq | grep -P "\tchrM__" > $target.build &&
-	mv $target.build $target
+	cat $prereq | gzip -f -9 > $target.build \
+	&& mv $target.build $target
