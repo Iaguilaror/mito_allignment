@@ -23,4 +23,5 @@ results/formito_%.fastq.gz:Q: results/%.chrM.fastq results/%.unmapped.fastq
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing fastq convertion to $target"
 	cat $prereq | gzip -f -9 > $target.build \
-	&& mv $target.build $target
+	&& mv $target.build $target \
+	&& rm $prereq
