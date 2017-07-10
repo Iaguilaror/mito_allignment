@@ -3,7 +3,7 @@
 all:QV:
 	bin/targets | xargs mk
 
-results/%.chrM.fastq:Q: data/SNAP_bams/%.bam
+results/%.chrM.fastq:Q: data/SNAP_bams/%.unpaired.bam
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing $target"
 	samtools view -h -F 4 $prereq \
@@ -12,14 +12,14 @@ results/%.chrM.fastq:Q: data/SNAP_bams/%.bam
 	| bamToFastq -i - -fq $target.build \
 	&& mv $target.build $target
 
-results/%.unmapped.fastq:Q: data/SNAP_bams/%.bam
+results/%.unmapped.fastq:Q: data/SNAP_bams/%.unpaired.bam
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing $target"
 	samtools view -h -f 4 -b $prereq \
 	| bamToFastq -i - -fq $target.build \
 	&& mv $target.build $target
 
-results/formito_%.fastq.gz:Q: results/%.chrM.fastq results/%.unmapped.fastq
+results/%_mitochondrial.unpaired.fastq.gz:Q: results/%.chrM.fastq results/%.unmapped.fastq
 	mkdir -p $(dirname $target)
 	echo "[DEBUGGING]doing fastq convertion to $target"
 	cat $prereq | gzip -f -9 > $target.build \
