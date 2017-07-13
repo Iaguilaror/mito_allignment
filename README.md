@@ -19,10 +19,9 @@ This module can process any .bam file that has the "chrM" contig defined in the 
 
 ## 002/ - Read alignment using SNAP against NC_012920.1
 Modification from SNAP allignment module developed at inmegen. Makes new alignments using mithocondrial genome NC_012920.1, and using the fastq.gz files generated in 001a and 001b.
-
-[snap]: http://snap.cs.berkeley.edu/
-[man snap]: http://snap.cs.berkeley.edu/downloads/snap-1.0beta-manual.pdf
-[snap quickstart]: http://snap.cs.berkeley.edu/downloads/snap-1.0beta-quickstart.pdf
+snap: http://snap.cs.berkeley.edu/
+man snap: http://snap.cs.berkeley.edu/downloads/snap-1.0beta-manual.pdf
+snap quickstart: http://snap.cs.berkeley.edu/downloads/snap-1.0beta-quickstart.pdf
 
 1. The SNAP index was created with default parameters, since NC_012920.1 genome is small. Tweaks to index generation would have a minimal gain in time optimization of future alignments.
 2. Regarding the original development of /100g/analysis/002b/, this modification of the mkfile has the following line:
