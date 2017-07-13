@@ -1,4 +1,8 @@
-## Module for making new mitocondrial alignments
+# Module for making new mitocondrial alignments
+
+This document explains the stages for SNAP remapping of mitochondrial regions against NC_012920.1 mitochondrial reference genome.
+Process starts from previously SNAP alignments done using whole genome Homo_sapiens_assembly38 as reference, from the broad institute bundle.
+This module can process any .bam file that has the "chrM" contig defined in the header.
 
 001a/ For unpaired.bam files. Extracting unaligned reads & reads aligned against chrM in previous alignments done using mithocondrial genome J01415.2. These reads are used to build fastqz files.
 
