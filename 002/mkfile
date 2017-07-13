@@ -1,0 +1,34 @@
+<config.mk
+
+# snap fails if more than one snap process is active
+NPROC=1
+
+SNAP_SINGLE_TARGETS=`bin/targets-unpaired`
+SNAP_PAIRED_TARGETS=`bin/targets-paired`
+
+align-reads:V: $SNAP_SINGLE_TARGETS $SNAP_PAIRED_TARGETS
+
+results/%.unpaired.bam:D:	data/unpaired/%.unpaired.fastq.gz
+	mkdir -p `dirname $target`
+	snap-aligner \
+		single \
+		$SNAP_REFERENCEDIR \
+		$prereq \
+		$SNAP_OPTS \
+		-o -sam - \
+	| sed "s#ref|NC_012920.1|_Homo_sapiens_mitochondrion,_complete_genome#chrM#g" \
+	| samtools view -S -b -o $target".build" - \
+	&& mv $target".build" $target
+
+results/%.paired.bam:D:	data/paired/%_R1.paired.fastq.gz	data/paired/%_R2.paired.fastq.gz
+	mkdir -p `dirname $target`
+	snap-aligner \
+		paired \
+		$SNAP_REFERENCEDIR \
+		$prereq \
+		$SNAP_OPTS \
+		-o -sam - \
+	| sed "s#ref|NC_012920.1|_Homo_sapiens_mitochondrion,_complete_genome#chrM#g" \
+	| samtools view -S -b -o $target".build" - \
+	&& mv $target".build" $target
+

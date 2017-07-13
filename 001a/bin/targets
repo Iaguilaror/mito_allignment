@@ -1,5 +1,5 @@
 #!/bin/bash
 
 find -L data/SNAP_bams/ -type f -name "*.unpaired.bam" \
-| sed -e "s#data/SNAP_bams/#results/formito_#g" \
--e "s#.bam#.fastq.gz#g"
+| sed -e "s#data/SNAP_bams/#results/#g" \
+-e "s#.unpaired.bam#_mitochondrial.unpaired.fastq.gz#g"
