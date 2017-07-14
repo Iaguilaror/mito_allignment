@@ -27,7 +27,7 @@ Modification from SNAP allignment module developed at inmegen. Makes new alignme
 2. Regarding the original development of /100g/analysis/002b/, this modification of the mkfile has the following line:
 _sed "s#ref|NC_012920.1|_Homo_sapiens_mitochondrion,_complete_genome#chrM#g"_
 Said line changes the complex chromosome name asigned by SNAP, to a "chrM" format, which is more widely used.
-Example from paired:
+Example from 001b, the paired module:
 ```
 results/%.paired.bam:D:	data/paired/%_R1.paired.fastq.gz	data/paired/%_R2.paired.fastq.gz
 	mkdir -p dirname $target
