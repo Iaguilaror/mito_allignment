@@ -1,8 +1,10 @@
-# Module for making new mitocondrial alignments
+# Module for making new mitocondrial alignments, from previous whole-genome alignments.
 
-This document explains the stages for SNAP remapping of mitochondrial regions against NC_012920.1 mitochondrial reference genome.
-Process starts from previously SNAP alignments done using whole genome Homo_sapiens_assembly38 as reference, from the broad institute bundle.
-This module can process any .bam file that has the "chrM" contig defined in the header, as long as the file contains R1 or R2 in filename, and "paired" or "unpaired" adjective. 
+As part of mitochondrial analysis of 1000G-MX, we used this module to extract and remap mithocondrial and unmapped reads of whole-genome bams. New mitochondrial mapping was performed using SNAP aligner, and [NC_012920.1](https://www.ncbi.nlm.nih.gov/nuccore/NC_012920.1) mitochondrial reference genome, since this version of the genome is more adequate for haplogroup studies.
+
+Process starts from previous SNAP alignments done using whole genome Homo_sapiens_assembly38 as reference, from the [broad institute bundle](https://console.cloud.google.com/storage/browser/genomics-public-data/resources/broad/hg38/v0/?pli=1).
+
+This module can process any .bam file that has the "chrM" contig defined in the header, as long as the file contains R1 or R2 in filename, and "paired" or "unpaired" adjective.
 
 ## 001a - For extracting *.unpaired.fastq.gz, from *.unpaired.bam:
 	1. extraction of unpaired reads mapped at "chrM"
